@@ -1,4 +1,4 @@
-function Create-Config {
+function New-Config {
     [System.XML.XMLDocument]$XML = New-Object System.XML.XMLDocument
     
     [System.XML.XMLElement]$Root = $XML.CreateElement("config")
@@ -26,8 +26,12 @@ function Create-Config {
     $XML.Save(("$pwd\config.xml"))
 }
 
+function get-accounts {
+    $namespace.Folders | Format-Table name
+}
+
 if (![System.IO.File]::Exists("$PWD\config.xml")) {
-    Create-Config
+    New-Config
 }
 
 $config = [xml](Get-Content .\config.xml)
