@@ -1,3 +1,13 @@
+Param(
+    [switch]$Accounts
+)
+
+if ($Accounts) {
+    Get-Accounts
+    Exit
+}
+
+
 function New-Config {
     [System.XML.XMLDocument]$XML = New-Object System.XML.XMLDocument
     
@@ -26,7 +36,7 @@ function New-Config {
     $XML.Save(("$pwd\config.xml"))
 }
 
-function get-accounts {
+function Get-Accounts {
     $namespace.Folders | Format-Table name
 }
 
