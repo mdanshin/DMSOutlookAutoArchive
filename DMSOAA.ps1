@@ -1,50 +1,30 @@
 Param(
-    [switch]$Accounts
+    [Parameter(ParameterSetName='One')][switch]$Accounts,
+    [Parameter(ParameterSetName='Two')][switch]$WhatIf,
+    [Parameter(ParameterSetName='Three')][switch]$NewConfig
 )
+
+. ".\lib.ps1"
 
 if ($Accounts) {
     Get-Accounts
     Exit
 }
 
-
-function New-Config {
-    [System.XML.XMLDocument]$XML = New-Object System.XML.XMLDocument
-    
-    [System.XML.XMLElement]$Root = $XML.CreateElement("config")
-    $XML.appendChild($Root)
-
-    [System.XML.XMLElement]$mainAccount = $Root.AppendChild($XML.CreateElement("mainAccount"))
-    $mainAccount.InnerText = "username@domain.com"
-
-    [System.XML.XMLElement]$archiveAccount = $Root.AppendChild($XML.CreateElement("archiveAccount"))
-    $archiveAccount.InnerText = "Archive"
-
-    [System.XML.XMLElement]$moveDays = $Root.AppendChild($XML.CreateElement("moveDays"))
-    $comment = $XML.CreateComment('Not used if moveDate is set')
-    $XML.DocumentElement.AppendChild($comment)
-    $moveDays.InnerText = "30"
-
-    [System.XML.XMLElement]$moveDate = $Root.AppendChild($XML.CreateElement("moveDate"))
-    $comment = $XML.CreateComment('MM/dd/yyyy')
-    $XML.DocumentElement.AppendChild($comment)
-    $moveDate.InnerText = ""
-
-    [System.XML.XMLElement]$oldest = $Root.AppendChild($XML.CreateElement("oldest"))
-    $oldest.InnerText = "true"
-
-    $XML.Save(("$pwd\config.xml"))
+if ($NewConfig) {
+    if (![System.IO.File]::Exists("$PWD\config.xml")) {
+        New-Config
+    }
+    Exit
 }
 
-function Get-Accounts {
-    $namespace.Folders | Format-Table name
+try {
+    $config = [xml](Get-Content .\config.xml -ErrorAction Stop)
 }
-
-if (![System.IO.File]::Exists("$PWD\config.xml")) {
-    New-Config
+catch {
+    Write-Error "config.xml does not exist. Try to use -NewConfig parametr."
+    Break
 }
-
-$config = [xml](Get-Content .\config.xml)
 
 $mAccount = $config.config.mainAccount
 $aAccount = $config.config.archiveAccount
@@ -86,5 +66,4 @@ else {
     Write-Output ("Younger then $LastMonths" + ": " + ($items = $inboxItems | Where-Object -FilterScript { $_.senton -ge $LastMonths}).Count)
 }
 
-$deletedItems = $items | ForEach-Object -Process { $PSItem.Move($archive) }
-Write-Output ("Moved: " + $deletedItems.Count)
+Move-Items
