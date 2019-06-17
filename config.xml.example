@@ -1,0 +1,10 @@
+<config>
+  <mainAccount>username@domain.com</mainAccount>
+  <archiveAccount>Archive</archiveAccount>
+  <moveDays>30</moveDays>
+  <!--Not used if moveDate is set-->
+  <moveDate>
+  </moveDate>
+  <!--MM/dd/yyyy-->
+  <oldest>true</oldest>
+</config>
