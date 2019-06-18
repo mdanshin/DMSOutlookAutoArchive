@@ -10,6 +10,8 @@ Param(
     [switch]$NewConfig
 )
 
+Set-Location $PSScriptRoot
+
 . ".\lib.ps1"
 
 switch ($PsCmdlet.ParameterSetName) {
@@ -18,7 +20,7 @@ switch ($PsCmdlet.ParameterSetName) {
         Exit
     }
     "NewConfig" {
-        if (![System.IO.File]::Exists("$PWD\config.xml")) {
+        if (![System.IO.File]::Exists(".\config.xml")) {
         New-Config
         }
     }
