@@ -54,3 +54,14 @@ If PSSecurityException occur, try the following:
 $cert = Get-ChildItem Cert:\LocalMachine\My\
 Set-AuthenticodeSignature -Certificate $cert -FilePath "Path to file"
 ```
+
+## TODO
+1. Update New-Config function
+2. Update config.xml.example
+3. Add user confirmation
+
+
+## TODO
+1. Update New-Config function
+2. Update config.xml.example
+3. Add user confirmation
