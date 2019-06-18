@@ -27,15 +27,38 @@ function New-Config {
 }
 
 function Get-Accounts {
+    
+    [CmdletBinding()]
+    param (
+        [Parameter(Position=0,mandatory=$true)]
+        $namespace
+    )
+
     $namespace.Folders | Format-Table name
 }
 
-function Move-Items {
-    if ($WhatIf) {
-        
+function Move-Items ($items, $archive) {
+    if ($items) {
+        $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($archive) }        
     }
-    else {
-        $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($archive) }
-        Write-Output ("Moved: " + $deletedItems.Count)        
-    }
+    Write-Output ("Moved: " + $deletedItems.Count)
+    
+}
+
+function New-Outlook {
+    $outlook = New-Object -ComObject outlook.application
+    $namespace = $outlook.Getnamespace("MAPI")
+    return $namespace
+}
+
+function Read-Config {
+    [hashtable]$return = @{}
+
+    $return.mAccount = $config.config.mainAccount
+    $return.aAccount = $config.config.archiveAccount
+    $return.moveDays = $config.config.moveDays-1
+    $return.moveDate = $config.config.moveDate
+    $return.oldest = $config.config.oldest
+
+    return $return
 }
