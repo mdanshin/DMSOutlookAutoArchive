@@ -19,13 +19,13 @@ You will need PowerShell and Microsoft Outlook. Please note that Autluk must be 
 
 Clone or download project and extract from archive.
 
-First run the `DMSOAA.ps1` with `-NewConfig` parametr.
+First run the `DMSOAA.ps1` with `-NewConfig` parameter.
 
 ```Powershell
 .\DMSOAA.ps1 -NewConfig
 ```
 
-Then run the script with `-Accounts` parametr.
+Then run the script with `-Accounts` parameter.
 
 ```Powershell
 .\DMSOAA.ps1 -Accounts
@@ -33,7 +33,7 @@ Then run the script with `-Accounts` parametr.
 
 You will see all mailboxes and datafiles coYou will see all connected mailboxes and data files.
 
-Finally, edit the configuration file `config.xml`.
+Finally, edit the configuration file `config.xml`. Then run the script without any parameters.
 
 ## Example of the config.xml
 
