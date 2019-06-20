@@ -43,11 +43,13 @@ switch ($PsCmdlet.ParameterSetName) {
         $outlook = New-Object -ComObject outlook.application
         $namespace = $outlook.Getnamespace("MAPI")
 
-        $mainAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.mAccount };
-        $archiveAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.aAccount };
+        $mainAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.mainAccount };
+        $archiveAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.archiveAccount };
 
-        $inbox = $mainAccount.Folders | Where-Object { $_.Name -match $config.mFolder }
-        $archive = $archiveAccount.Folders | Where-Object { $_.Name -match $config.aFolder }
+        $inbox = $mainAccount.Folders | Where-Object { $_.Name -match $config.mainFolder }
+        $archive = $archiveAccount.Folders | Where-Object { $_.Name -match $config.archiveFolder }
+
+        $config
 
         Write-Output ("Total items: " + ($inboxItems = $inbox.Items).Count)
 

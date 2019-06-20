@@ -26,10 +26,10 @@ function New-Config {
     $archiveAccount.InnerText = "Archive"
 
     [System.XML.XMLElement]$mainFolder = $Root.AppendChild($XML.CreateElement("mainFolder"))
-    $mainFolder.InnerText = ""
+    $mainFolder.InnerText = "mainFolder"
 
     [System.XML.XMLElement]$archiveFolder = $Root.AppendChild($XML.CreateElement("archiveFolder"))
-    $archiveFolder.InnerText = ""
+    $archiveFolder.InnerText = "archiveFolder"
 
     [System.XML.XMLElement]$moveDays = $Root.AppendChild($XML.CreateElement("moveDays"))
     $comment = $XML.CreateComment('Not used if moveDate is set')
@@ -84,10 +84,10 @@ function Read-Config {
 
     [hashtable]$return = @{}
 
-    $return.mAccount = $config.config.mainAccount
-    $return.aAccount = $config.config.archiveAccount
-    $return.mFolder  = $config.config.mainFolder
-    $return.aFolder  = $config.config.archiveFolder    
+    $return.mainAccount = $config.config.mainAccount
+    $return.archiveAccount = $config.config.archiveAccount
+    $return.mainFolder  = $config.config.mainFolder
+    $return.archiveFolder  = $config.config.archiveFolder    
     $return.moveDays = $config.config.moveDays
     $return.moveDate = $config.config.moveDate
     $return.oldest   = $config.config.oldest
