@@ -49,7 +49,7 @@ switch ($PsCmdlet.ParameterSetName) {
         $inbox = $mainAccount.Folders | Where-Object { $_.Name -match $config.mainFolder }
         $archive = $archiveAccount.Folders | Where-Object { $_.Name -match $config.archiveFolder }
 
-        $config
+        if ($VerbosePreference) {$config}      
 
         Write-Output ("Total items: " + ($inboxItems = $inbox.Items).Count)
 
