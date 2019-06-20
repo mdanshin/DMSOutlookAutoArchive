@@ -1,6 +1,8 @@
 <config>
   <mainAccount>username@domain.com</mainAccount>
   <archiveAccount>Archive</archiveAccount>
+  <mainFolder>Sent Items</mainFolder>
+  <archiveFolder>Sent Items</archiveFolder>
   <moveDays>30</moveDays>
   <!--Not used if moveDate is set-->
   <moveDate>

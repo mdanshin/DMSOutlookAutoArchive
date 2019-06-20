@@ -29,15 +29,6 @@ switch ($PsCmdlet.ParameterSetName) {
 
     }
     Default {
-
-        try {
-            $config = [xml](Get-Content .\config.xml -ErrorAction Stop)
-        }
-        catch {
-            Write-Error "config.xml does not exist. Try to use -NewConfig parametr."
-            Break
-        }
-
         $config = Read-Config
 
         if ($config.moveDate) {
@@ -62,7 +53,8 @@ switch ($PsCmdlet.ParameterSetName) {
 
         switch ($config.oldest) {
             'true' {
-                Write-Output ("Older then $deleteDate" + ": " + ( $items = $inboxItems | Where-Object -FilterScript { $_.senton -le $deleteDate}).Count)
+                $items = $inboxItems | Where-Object -FilterScript { $_.senton -le $deleteDate}
+                Write-Output ("Older then $deleteDate" + ": " + ( $items | measure-object ).count)
             }
             Default {
                 Write-Output ("Younger then $deleteDate" + ": " + ($items = $inboxItems | Where-Object -FilterScript { $_.senton -ge $deleteDate}).Count)

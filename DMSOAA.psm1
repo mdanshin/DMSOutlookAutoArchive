@@ -25,6 +25,12 @@ function New-Config {
     [System.XML.XMLElement]$archiveAccount = $Root.AppendChild($XML.CreateElement("archiveAccount"))
     $archiveAccount.InnerText = "Archive"
 
+    [System.XML.XMLElement]$mainFolder = $Root.AppendChild($XML.CreateElement("mainFolder"))
+    $mainFolder.InnerText = ""
+
+    [System.XML.XMLElement]$archiveFolder = $Root.AppendChild($XML.CreateElement("archiveFolder"))
+    $archiveFolder.InnerText = ""
+
     [System.XML.XMLElement]$moveDays = $Root.AppendChild($XML.CreateElement("moveDays"))
     $comment = $XML.CreateComment('Not used if moveDate is set')
     $XML.DocumentElement.AppendChild($comment)
@@ -53,11 +59,12 @@ function Get-Accounts {
 }
 
 function Move-Items ($items, $archive) {
-    if ($items) {
+    $confirmation = Read-Host "Are you Sure You Want To Proceed [y/N]?"
+
+    if ($confirmation -eq 'y' -and $items) {
         $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($archive) }        
     }
-    Write-Output ("Moved: " + $deletedItems.Count)
-    
+    Write-Output ("Moved: " + ( $deletedItems | measure-object ).Count)
 }
 
 function New-Outlook {
@@ -67,17 +74,26 @@ function New-Outlook {
 }
 
 function Read-Config {
+    try {
+        $config = [xml](Get-Content .\config.xml -ErrorAction Stop)
+    }
+    catch {
+        Write-Error "config.xml does not exist. Try to use -NewConfig parametr."
+        Break
+    }
+
     [hashtable]$return = @{}
 
     $return.mAccount = $config.config.mainAccount
     $return.aAccount = $config.config.archiveAccount
-    $return.moveDays = $config.config.moveDays-1
+    $return.moveDays = $config.config.moveDays
     $return.moveDate = $config.config.moveDate
-    $return.oldest = $config.config.oldest
-    $return.mFolder = $config.config.mainFolder
-    $return.aFolder = $config.config.archiveFolder
+    $return.oldest   = $config.config.oldest
+    $return.mFolder  = $config.config.mainFolder
+    $return.aFolder  = $config.config.archiveFolder
 
     return $return
+
 }
 # SIG # Begin signature block
 # MIIO+wYJKoZIhvcNAQcCoIIO7DCCDugCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
