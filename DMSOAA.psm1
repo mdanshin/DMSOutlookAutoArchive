@@ -1,76 +1,83 @@
-[CmdLetBinding(DefaultParameterSetName="None")]
-Param(
-    [Parameter(ParameterSetName='Accounts', Mandatory=$true)]
-    [switch]$Accounts,
+<#
+.SYNOPSIS
+Short description
 
-    [Parameter(ParameterSetName='WhatIf', Mandatory=$false)]
-    [switch]$WhatIf,
+.DESCRIPTION
+Long description
 
-    [Parameter(ParameterSetName='NewConfig', Mandatory=$false)]
-    [switch]$NewConfig
-)
+.EXAMPLE
+An example
 
-Set-Location $PSScriptRoot
+.NOTES
+General notes
+#>
 
-Import-Module .\DMSOAA.psm1
+##
+function New-Config {
+    [System.XML.XMLDocument]$XML = New-Object System.XML.XMLDocument
+    
+    [System.XML.XMLElement]$Root = $XML.CreateElement("config")
+    $XML.appendChild($Root)
 
-switch ($PsCmdlet.ParameterSetName) {
-    "Accounts" {
-        Get-Accounts (New-Outlook)
-        Exit
+    [System.XML.XMLElement]$mainAccount = $Root.AppendChild($XML.CreateElement("mainAccount"))
+    $mainAccount.InnerText = "username@domain.com"
+
+    [System.XML.XMLElement]$archiveAccount = $Root.AppendChild($XML.CreateElement("archiveAccount"))
+    $archiveAccount.InnerText = "Archive"
+
+    [System.XML.XMLElement]$moveDays = $Root.AppendChild($XML.CreateElement("moveDays"))
+    $comment = $XML.CreateComment('Not used if moveDate is set')
+    $XML.DocumentElement.AppendChild($comment)
+    $moveDays.InnerText = "30"
+
+    [System.XML.XMLElement]$moveDate = $Root.AppendChild($XML.CreateElement("moveDate"))
+    $comment = $XML.CreateComment('MM/dd/yyyy')
+    $XML.DocumentElement.AppendChild($comment)
+    $moveDate.InnerText = ""
+
+    [System.XML.XMLElement]$oldest = $Root.AppendChild($XML.CreateElement("oldest"))
+    $oldest.InnerText = "true"
+
+    $XML.Save(("$pwd\config.xml"))
+}
+
+function Get-Accounts {
+    
+    [CmdletBinding()]
+    param (
+        [Parameter(Position=0,mandatory=$true)]
+        $namespace
+    )
+
+    $namespace.Folders | Format-Table name
+}
+
+function Move-Items ($items, $archive) {
+    if ($items) {
+        $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($archive) }        
     }
-    "NewConfig" {
-        if (![System.IO.File]::Exists(".\config.xml")) {
-        New-Config
-        }
-    }
-    "WhatIf" {
-        Write-Host "TBD"
+    Write-Output ("Moved: " + $deletedItems.Count)
+    
+}
 
-    }
-    Default {
+function New-Outlook {
+    $outlook = New-Object -ComObject outlook.application
+    $namespace = $outlook.Getnamespace("MAPI")
+    return $namespace
+}
 
-        try {
-            $config = [xml](Get-Content .\config.xml -ErrorAction Stop)
-        }
-        catch {
-            Write-Error "config.xml does not exist. Try to use -NewConfig parametr."
-            Break
-        }
+function Read-Config {
+    [hashtable]$return = @{}
 
-        $config = Read-Config
+    $return.mAccount = $config.config.mainAccount
+    $return.aAccount = $config.config.archiveAccount
+    $return.moveDays = $config.config.moveDays-1
+    $return.moveDate = $config.config.moveDate
+    $return.oldest = $config.config.oldest
+    $return.mFolder = $config.config.mainFolder
+    $return.aFolder = $config.config.archiveFolder
 
-        if ($config.moveDate) {
-            [DateTime]$Date = $config.moveDate
-        }
-        else {
-            $Date = [DateTime]::Now.AddDays(-$config.moveDays) 
-        }
-
-        $deleteDate =  $Date.tostring("MM/dd/yyyy")
-
-        $outlook = New-Object -ComObject outlook.application
-        $namespace = $outlook.Getnamespace("MAPI")
-
-        $mainAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.mAccount };
-        $archiveAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.aAccount };
-
-        $inbox = $mainAccount.Folders | Where-Object { $_.Name -match $config.mFolder }
-        $archive = $archiveAccount.Folders | Where-Object { $_.Name -match $config.aFolder }
-
-        Write-Output ("Total items: " + ($inboxItems = $inbox.Items).Count)
-
-        switch ($config.oldest) {
-            'true' {
-                Write-Output ("Older then $deleteDate" + ": " + ( $items = $inboxItems | Where-Object -FilterScript { $_.senton -le $deleteDate}).Count)
-            }
-            Default {
-                Write-Output ("Younger then $deleteDate" + ": " + ($items = $inboxItems | Where-Object -FilterScript { $_.senton -ge $deleteDate}).Count)
-            }
-        }
-
-        Move-Items $items $archive
-    }
+    return $return
 }
 # SIG # Begin signature block
 # MIIO+wYJKoZIhvcNAQcCoIIO7DCCDugCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
