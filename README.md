@@ -31,9 +31,9 @@ Then run the script with `-Accounts` parameter.
 .\DMSOAA.ps1 -Accounts
 ```
 
-You will see all mailboxes and datafiles coYou will see all connected mailboxes and data files.
+You will see all connected mailboxes and data files.
 
-Finally, edit the configuration file `config.xml`. Then run the script without any parameters.
+Finally, edit the configuration file `config.xml`.Use the information you received before. Then run the script without any parameters.
 
 ## Example of the config.xml
 
