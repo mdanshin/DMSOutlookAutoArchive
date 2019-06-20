@@ -11,9 +11,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 What things you need to install the software and how to install them
 
-```
 You will need PowerShell and Microsoft Outlook. Please note that Autluk must be properly configured to work with at least one mailbox and at least one PST file must be connected to it.
-```
 
 ### How to use
 
