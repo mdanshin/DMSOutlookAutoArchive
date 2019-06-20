@@ -86,11 +86,11 @@ function Read-Config {
 
     $return.mAccount = $config.config.mainAccount
     $return.aAccount = $config.config.archiveAccount
+    $return.mFolder  = $config.config.mainFolder
+    $return.aFolder  = $config.config.archiveFolder    
     $return.moveDays = $config.config.moveDays
     $return.moveDate = $config.config.moveDate
     $return.oldest   = $config.config.oldest
-    $return.mFolder  = $config.config.mainFolder
-    $return.aFolder  = $config.config.archiveFolder
 
     return $return
 
