@@ -12,26 +12,42 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them
 
 ```
-Give examples
+You will need PowerShell and Microsoft Outlook. Please note that Autluk must be properly configured to work with at least one mailbox and at least one PST file must be connected to it.
 ```
 
-### Installing
+### How to use
 
-A step by step series of examples that tell you how to get a development env running
+Clone or download project and extract from archive.
 
-Say what the step will be
+First run the `DMSOAA.ps1` with `-NewConfig` parametr.
 
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
+```powershell
+.\DMSOAA.ps1 -NewConfig
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+Then run the script with `-Accounts` parametr.
+
+```powershell
+.\DMSOAA.ps1 -NewConfig
+```
+
+You will see all mailboxes and datafiles coYou will see all connected mailboxes and data files.
+
+Finally, edit the configuration file `config.xml`.
+
+## Example of the config.xml
+
+```XML
+<config>
+  <mainAccount>username@domain.com</mainAccount>
+  <archiveAccount>Archive</archiveAccount>
+  <mainFolder>Sent Items</mainFolder>
+  <archiveFolder>Sent Items</archiveFolder>
+  <moveDays>30</moveDays> <!--Not used if moveDate is set-->
+  <moveDate></moveDate> <!--MM/dd/yyyy-->
+  <oldest>true</oldest>
+</config>
+```
 
 ## Authors
 
@@ -55,7 +71,4 @@ $cert = Get-ChildItem Cert:\LocalMachine\My\
 Set-AuthenticodeSignature -Certificate $cert -FilePath "Path to file"
 ```
 
-## TODO
-1. Update New-Config function
-2. Update config.xml.example
-3. Add user confirmation
+You may have problems working with Cyrillic characters.
