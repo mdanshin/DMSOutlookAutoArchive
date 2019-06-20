@@ -21,13 +21,13 @@ Clone or download project and extract from archive.
 
 First run the `DMSOAA.ps1` with `-NewConfig` parametr.
 
-```powershell
+```Powershell
 .\DMSOAA.ps1 -NewConfig
 ```
 
 Then run the script with `-Accounts` parametr.
 
-```powershell
+```Powershell
 .\DMSOAA.ps1 -NewConfig
 ```
 
@@ -66,7 +66,7 @@ TBD
 ## Known issues
 If PSSecurityException occur, try the following:
 
-```
+```Powershell
 $cert = Get-ChildItem Cert:\LocalMachine\My\
 Set-AuthenticodeSignature -Certificate $cert -FilePath "Path to file"
 ```
