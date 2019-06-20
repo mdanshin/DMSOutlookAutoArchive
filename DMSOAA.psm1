@@ -75,7 +75,7 @@ function New-Outlook {
 
 function Read-Config {
     try {
-        $config = [xml](Get-Content .\config.xml -ErrorAction Stop)
+        $config = [xml](Get-Content .\config.xml -Encoding UTF8 -ErrorAction Stop)
     }
     catch {
         Write-Error "config.xml does not exist. Try to use -NewConfig parametr."
