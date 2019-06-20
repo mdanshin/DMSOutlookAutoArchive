@@ -28,7 +28,7 @@ First run the `DMSOAA.ps1` with `-NewConfig` parametr.
 Then run the script with `-Accounts` parametr.
 
 ```Powershell
-.\DMSOAA.ps1 -NewConfig
+.\DMSOAA.ps1 -Accounts
 ```
 
 You will see all mailboxes and datafiles coYou will see all connected mailboxes and data files.
