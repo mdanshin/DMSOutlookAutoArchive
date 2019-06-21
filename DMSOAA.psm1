@@ -19,17 +19,17 @@ function New-Config {
     [System.XML.XMLElement]$Root = $XML.CreateElement("config")
     $XML.appendChild($Root)
 
-    [System.XML.XMLElement]$mainAccount = $Root.AppendChild($XML.CreateElement("mainAccount"))
-    $mainAccount.InnerText = "username@domain.com"
+    [System.XML.XMLElement]$exchangeAccount = $Root.AppendChild($XML.CreateElement("exchangeAccount"))
+    $exchangeAccount.InnerText = "username@domain.com"
 
-    [System.XML.XMLElement]$archiveAccount = $Root.AppendChild($XML.CreateElement("archiveAccount"))
-    $archiveAccount.InnerText = "Archive"
+    [System.XML.XMLElement]$pstFile = $Root.AppendChild($XML.CreateElement("pstFile"))
+    $pstFile.InnerText = "Archive"
 
-    [System.XML.XMLElement]$mainFolder = $Root.AppendChild($XML.CreateElement("mainFolder"))
-    $mainFolder.InnerText = "mainFolder"
+    [System.XML.XMLElement]$fromFolder = $Root.AppendChild($XML.CreateElement("fromFolder"))
+    $fromFolder.InnerText = "Inbox"
 
-    [System.XML.XMLElement]$archiveFolder = $Root.AppendChild($XML.CreateElement("archiveFolder"))
-    $archiveFolder.InnerText = "archiveFolder"
+    [System.XML.XMLElement]$toFolder = $Root.AppendChild($XML.CreateElement("toFolder"))
+    $toFolder.InnerText = "Inbox Archive"
 
     [System.XML.XMLElement]$moveDays = $Root.AppendChild($XML.CreateElement("moveDays"))
     $comment = $XML.CreateComment('Not used if moveDate is set')
@@ -84,10 +84,10 @@ function Read-Config {
 
     [hashtable]$return = @{}
 
-    $return.mainAccount = $config.config.mainAccount
-    $return.archiveAccount = $config.config.archiveAccount
-    $return.mainFolder  = $config.config.mainFolder
-    $return.archiveFolder  = $config.config.archiveFolder    
+    $return.exchangeAccount = $config.config.exchangeAccount
+    $return.pstFile = $config.config.pstFile
+    $return.fromFolder  = $config.config.fromFolder
+    $return.toFolder  = $config.config.toFolder    
     $return.moveDays = $config.config.moveDays
     $return.moveDate = $config.config.moveDate
     $return.oldest   = $config.config.oldest

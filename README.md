@@ -37,10 +37,10 @@ Finally, edit the configuration file `config.xml`.Use the information you receiv
 
 ```XML
 <config>
-  <mainAccount>username@domain.com</mainAccount>
-  <archiveAccount>Archive</archiveAccount>
-  <mainFolder>Sent Items</mainFolder>
-  <archiveFolder>Sent Items</archiveFolder>
+  <exchangeAccount>username@domain.com</exchangeAccount> <!--A-->
+  <pstFile>Archive</pstFile>
+  <fromFolder>Sent Items</fromFolder>
+  <toFolder>Sent Items</toFolder>
   <moveDays>30</moveDays> <!--Not used if moveDate is set-->
   <moveDate></moveDate> <!--MM/dd/yyyy-->
   <oldest>true</oldest>

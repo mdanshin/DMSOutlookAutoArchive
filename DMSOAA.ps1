@@ -43,11 +43,11 @@ switch ($PsCmdlet.ParameterSetName) {
         $outlook = New-Object -ComObject outlook.application
         $namespace = $outlook.Getnamespace("MAPI")
 
-        $mainAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.mainAccount };
-        $archiveAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.archiveAccount };
+        $exchangeAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.exchangeAccount };
+        $pstFile = $namespace.Folders | Where-Object { $_.Name -eq $config.pstFile };
 
-        $inbox = $mainAccount.Folders | Where-Object { $_.Name -match $config.mainFolder }
-        $archive = $archiveAccount.Folders | Where-Object { $_.Name -match $config.archiveFolder }
+        $inbox = $exchangeAccount.Folders | Where-Object { $_.Name -match $config.fromFolder }
+        $archive = $pstFile.Folders | Where-Object { $_.Name -match $config.toFolder }
 
         if ($VerbosePreference) {$config}      
 
