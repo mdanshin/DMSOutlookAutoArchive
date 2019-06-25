@@ -1,3 +1,4 @@
+# Определяем параметры командной строки
 [CmdLetBinding(DefaultParameterSetName="None")]
 Param(
     [Parameter(ParameterSetName='Accounts', Mandatory=$true)]
@@ -10,13 +11,18 @@ Param(
     [switch]$NewConfig
 )
 
-Set-Location $PSScriptRoot
+# Переходим в папку, откуда запускается скрипт
+Write-Verbose "Changing folder"
+Set-Location $PSScriptRoot 
 
+# Подключаем модуль с функциями
+Write-Verbose "Opening module file"
 Import-Module .\DMSOAA.psm1
 
+# Определяем действия программы, в зависимости от указанных параметров командной строки
 switch ($PsCmdlet.ParameterSetName) {
     "Accounts" {
-        Get-Accounts (New-Outlook)
+        Get-Accounts (New-Outlook) # Вывести на экран информацию о подключенных п/я и PST-файлах
         Exit
     }
     "NewConfig" {
@@ -28,42 +34,45 @@ switch ($PsCmdlet.ParameterSetName) {
         Write-Host "TBD"
 
     }
-    Default {
-        $config = Read-Config
+    Default { # Дейсвтие по умолчанию, если не введён ни один параметр
+        Write-Verbose "Reading config file config.xml"
+        $config = Read-Config # Читаем конфигурационный файл в переменную $config         
 
-        if ($config.moveDate) {
+        if ($config.moveDate -and $config.moveDate -ne 'null') { # Если в конфигурационном файле определена дата, то присваеваем её перременной $Date
             [DateTime]$Date = $config.moveDate
         }
         else {
-            $Date = [DateTime]::Now.AddDays(-$config.moveDays) 
+            $Date = [DateTime]::Now.AddDays(-$config.moveDays) # Если дата не определена, то считываем количество дней из конфигурационного файла
         }
 
-        $deleteDate =  $Date.tostring("MM/dd/yyyy")
+        $deleteDate =  $Date.tostring("MM/dd/yyyy") # Приводим дату к нужному формату
 
-        $outlook = New-Object -ComObject outlook.application
-        $namespace = $outlook.Getnamespace("MAPI")
+        Write-Verbose "Creating Outlook object"
+        $outlook = New-Object -ComObject outlook.application # Создаём объект Outlook
+        $namespace = $outlook.Getnamespace("MAPI") # Считываем информацию о подключенных п/я и PST-файлах
 
-        $exchangeAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.exchangeAccount };
-        $pstFile = $namespace.Folders | Where-Object { $_.Name -eq $config.pstFile };
+        $exchangeAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.exchangeAccount } # Считываем иформацию о папках п/я из которого будем перемещать элементы
+        $pstFile = $namespace.Folders | Where-Object { $_.Name -eq $config.pstFile } # Считываем иформацию о папках п/я в который будем перемещать элементы
 
-        $inbox = $exchangeAccount.Folders | Where-Object { $_.Name -match $config.fromFolder }
-        $archive = $pstFile.Folders | Where-Object { $_.Name -match $config.toFolder }
+        $fromFolder = $exchangeAccount.Folders | Where-Object { $_.Name -match $config.fromFolder } # Выбираем папку из которой будем перемещать элементы
+        $toFolder = $pstFile.Folders | Where-Object { $_.Name -match $config.toFolder } # Выбираем папку в которую будем перемещать элементы
 
-        if ($VerbosePreference) {$config}      
+        
+        if ($VerbosePreference) {$config} # Если указана переменная командной строки -Verbose, то вывести в консоль содержимое переменно $config
 
-        Write-Output ("Total items: " + ($inboxItems = $inbox.Items).Count)
+        Write-Output ("`nTotal items: " + ($fromFolderItems = $fromFolder.Items).Count) # Кол-во элементов в папке из которой будем перемещать элементы
 
         switch ($config.oldest) {
             'true' {
-                $items = $inboxItems | Where-Object -FilterScript { $_.senton -le $deleteDate}
+                $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $deleteDate}
                 Write-Output ("Older then $deleteDate" + ": " + ( $items | measure-object ).count)
             }
             Default {
-                Write-Output ("Younger then $deleteDate" + ": " + ($items = $inboxItems | Where-Object -FilterScript { $_.senton -ge $deleteDate}).Count)
+                Write-Output ("Younger then $deleteDate" + ": " + ($items = $fromFolderItems | Where-Object -FilterScript { $_.senton -ge $deleteDate}).Count)
             }
         }
 
-        Move-Items $items $archive
+        Move-Items $items $toFolder
     }
 }
 # SIG # Begin signature block

@@ -37,9 +37,9 @@ function New-Config {
     $moveDays.InnerText = "30"
 
     [System.XML.XMLElement]$moveDate = $Root.AppendChild($XML.CreateElement("moveDate"))
-    $comment = $XML.CreateComment('MM/dd/yyyy')
+    $comment = $XML.CreateComment('<!-- null or MM/dd/yyyy-->')
     $XML.DocumentElement.AppendChild($comment)
-    $moveDate.InnerText = ""
+    $moveDate.InnerText = "null"
 
     [System.XML.XMLElement]$oldest = $Root.AppendChild($XML.CreateElement("oldest"))
     $oldest.InnerText = "true"

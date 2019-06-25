@@ -4,6 +4,6 @@
   <fromFolder>Sent Items</fromFolder>
   <toFolder>Sent Items</toFolder>
   <moveDays>30</moveDays> <!--Not used if moveDate is set-->
-  <moveDate></moveDate> <!--MM/dd/yyyy-->
+  <moveDate>null</moveDate> <!-- null or MM/dd/yyyy-->
   <oldest>true</oldest>
 </config>
