@@ -42,7 +42,7 @@ Finally, edit the configuration file `config.xml`.Use the information you receiv
   <fromFolder>Sent Items</fromFolder>
   <toFolder>Sent Items</toFolder>
   <moveDays>30</moveDays> <!--Not used if moveDate is set-->
-  <moveDate></moveDate> <!--MM/dd/yyyy-->
+  <moveDate>null</moveDate> <!--MM/dd/yyyy-->
   <oldest>true</oldest>
 </config>
 ```
