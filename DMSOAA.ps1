@@ -72,7 +72,7 @@ switch ($PsCmdlet.ParameterSetName) {
             }
         }
 
-        Move-Items $items $toFolder
+        if ($items -ge 0) {Move-Items $items $toFolder} else {Write-Output ("Nothing to move")}
     }
 }
 # SIG # Begin signature block
