@@ -8,7 +8,10 @@ Param(
     [switch]$WhatIf,
 
     [Parameter(ParameterSetName='NewConfig', Mandatory=$false)]
-    [switch]$NewConfig
+    [switch]$NewConfig,
+
+    [Parameter(ParameterSetName='Force', Mandatory=$false)]
+    [bool]$Force
 )
 
 # Переходим в папку, откуда запускается скрипт
@@ -60,7 +63,7 @@ switch ($PsCmdlet.ParameterSetName) {
         
         if ($VerbosePreference) {$config} # Если указана переменная командной строки -Verbose, то вывести в консоль содержимое переменно $config
 
-        Write-Output ("`nTotal items: " + ($fromFolderItems = $fromFolder.Items).Count) # Кол-во элементов в папке из которой будем перемещать элементы
+        Write-Output ("`nTotal items: " + ($fromFolderItems = $fromFolder.Items).Count) # Кол-во элементов в папке из которой будем перемещать элементы      
 
         switch ($config.oldest) {
             'true' {
@@ -72,7 +75,7 @@ switch ($PsCmdlet.ParameterSetName) {
             }
         }
 
-        if ($items.count -gt 0) {Move-Items $items $toFolder} else {Write-Output ("Nothing to move")}
+        if ($items.count -gt 0) {Move-Items $items $toFolder $Force} else {Write-Output ("Nothing to move")}
     }
 }
 # SIG # Begin signature block

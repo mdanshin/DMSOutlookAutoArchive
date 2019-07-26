@@ -58,11 +58,16 @@ function Get-Accounts {
     $namespace.Folders | Format-Table name
 }
 
-function Move-Items ($items, $archive) {
-    $confirmation = Read-Host "Are you Sure You Want To Proceed [y/N]?"
-
-    if ($confirmation -eq 'y' -and $items) {
-        $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($archive) }        
+function Move-Items ($items, $archive, $force) {
+    switch ($force) {
+        'true' {
+            $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($archive) } }
+        Default {
+            $confirmation = Read-Host "Are you Sure You Want To Proceed [y/N]?"
+            if ($confirmation -eq 'y' -and $items) {
+                $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($archive) }
+            }
+        }
     }
     Write-Output ("Moved: " + ( $deletedItems | measure-object ).Count)
 }
