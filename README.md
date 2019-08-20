@@ -37,23 +37,22 @@ Finally, edit the configuration file `config.json`.Use the information you recei
 
 ```json
 {
-    "exchangeAccount":"username@domain.com",
-    "pstFile":"archive",
-    "moveDate":"10",
-    "Oldest":"true",
-
-    "Folders" : [
-        {
-          "sourceFolders":[
-            {"1":"Inbox1"},
-            {"2":"Inbox2"}
-          ],
-          "destinationFolders":[
-            {"1":"Archive1"},
-            {"2":"Archive2"}
-          ]
-        }
-    ]
+    "Inbox":  {
+                  "toFolder":  "Arhive",
+                  "fromFolder":  "Inbox",
+                  "fromAccaunt":  "username@domain.com",
+                  "Oldest":  "true",
+                  "toAccaunt":  "My Outlook Data File",
+                  "moveDays":  "10"
+              },
+    "Sent":  {
+                 "toFolder":  "Arhive",
+                 "fromFolder":  "Inbox",
+                 "fromAccaunt":  "username@domain.com",
+                 "Oldest":  "true",
+                 "toAccaunt":  "My Outlook Data File",
+                 "moveDays":  "10"
+             }
 }
 ```
 
