@@ -36,6 +36,17 @@ Finally, edit the configuration file `config.json`. Use the information you rece
 
 ## Example of the config.json
 
+```
+    "Inbox":  {     `this is just text label, for you information`
+                  "toFolder":  "Archive",   `Name of the folder you want to move TO`
+                  "fromFolder":  "Inbox",   `Name of the folder you want to move FROM`
+                  "fromAccaunt":  "username@domain.com",
+                  "Oldest":  "true",
+                  "toAccaunt":  "My Outlook Data File",
+                  "moveDays":  "10"
+              },
+```
+
 ```json
 {
     "Inbox":  {
