@@ -108,7 +108,7 @@ function Move-Items ([bool]$force) {
             write-Host ($fromFolder.Name) -ForegroundColor Yellow -NoNewline
             Write-Host (": ") -NoNewline
             Write-Host (($fromFolderItems = $fromFolder.Items).Count) -ForegroundColor Green
-            
+#TODO remove code duplication
             switch ($config[$key].oldest) {
                 'true' {
                     $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $deleteDate}
@@ -125,7 +125,7 @@ function Move-Items ([bool]$force) {
                     }
                     
                 }
-
+#TODO remove code duplication
                 Default {
                     $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $deleteDate}
                     Write-Output ("Younger then $deleteDate" + ": " + ($items = $fromFolderItems | Where-Object -FilterScript { $_.senton -ge $deleteDate}).Count)
@@ -155,6 +155,14 @@ function New-Outlook {
     $outlook = New-Object -ComObject outlook.application
     $namespace = $outlook.Getnamespace("MAPI")
     return $namespace
+}
+
+function Get-Folders () {
+    #TODO
+}
+
+function Get-Items () {
+    #TODO
 }
 
 function Read-Config {
