@@ -70,7 +70,7 @@ function Get-Accounts {
     $namespace.Folders | Format-Table name
 }
 
-function Move-Items ($force) {
+function Move-Items ([bool]$force) {
     $configFromJson = Read-Config # Читаем конфигурационный файл в переменную $config
 
     #конвертируем из PSCustomObject в Hashtable
@@ -102,29 +102,41 @@ function Move-Items ($force) {
             $toFolder = $pstFile.Folders | Where-Object { $_.Name -match $config[$key].toFolder }
 
             #Кол-во элементов в папке из которой будем перемещать элементы
-            Write-Output ("`nTotal items in " + $fromFolder.Name + ": " + ($fromFolderItems = $fromFolder.Items).Count)
+            Write-Host ("`nTotal items for account ") -NoNewline
+            Write-Host ($exchangeAccount.Name) -ForegroundColor Yellow -NoNewline
+            Write-Host (" in ") -NoNewline
+            write-Host ($fromFolder.Name) -ForegroundColor Yellow -NoNewline
+            Write-Host (": ") -NoNewline
+            Write-Host (($fromFolderItems = $fromFolder.Items).Count) -ForegroundColor Green
             
             switch ($config[$key].oldest) {
                 'true' {
                     $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $deleteDate}
-                    Write-Output ("Older then $deleteDate" + ": " + ( $items | measure-object ).count)
-                    if ($items) {
+                    Write-Host ("Older then $deleteDate" + ": " + ( $items | measure-object ).count) 
+                    
+                    if (($null -ne $items) -and ($force -eq $false))
+                    {
                         $confirmation = Read-Host "Are you Sure You Want To Proceed [y/N]?"
                         if ($confirmation -ne 'y') {Exit} 
                     }
-                    else {
+                    elseif ($null -eq $items)                        
+                    {
                         Write-Output "Nothin to move..."
                     }
                     
                 }
 
                 Default {
+                    $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $deleteDate}
                     Write-Output ("Younger then $deleteDate" + ": " + ($items = $fromFolderItems | Where-Object -FilterScript { $_.senton -ge $deleteDate}).Count)
-                    if ($items) {
+
+                    if (($null -ne $items) -and ($force -eq $false))
+                    {
                         $confirmation = Read-Host "Are you Sure You Want To Proceed [y/N]?"
                         if ($confirmation -ne 'y') {Exit} 
                     }
-                    else {
+                    elseif ($null -eq $items)
+                    {
                         Write-Output "Nothin to move..."
                     }
                 }
