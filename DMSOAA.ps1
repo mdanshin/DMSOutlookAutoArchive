@@ -1,4 +1,4 @@
-#Requires -Version 4.0
+#Requires -Version 5.1
 
 # Определяем параметры командной строки
 [CmdLetBinding(DefaultParameterSetName="None")]

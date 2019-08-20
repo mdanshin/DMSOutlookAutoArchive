@@ -1,4 +1,4 @@
-#Requires -Version 4.0
+#Requires -Version 5.1
 <#
 .SYNOPSIS
 Move Outlook items from mailbox to archive, e.g. PST file
