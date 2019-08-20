@@ -1,13 +1,26 @@
 #Requires -Version 4.0
 <#
 .SYNOPSIS
-Short description
+Move Outlook items from mailbox to archive, e.g. PST file
 
 .DESCRIPTION
-Long description
+Move Outlook items from mailbox to archive, e.g. PST file
 
 .EXAMPLE
-An example
+Clone or download project and extract from archive.
+
+First run the DMSOAA.ps1 with -NewConfig parameter.
+
+.\DMSOAA.ps1 -NewConfig
+cp .\config.json.example .\config.json
+
+Then run the script with -Accounts parameter.
+
+.\DMSOAA.ps1 -Accounts
+
+You will see all connected mailboxes and data files.
+
+Finally, edit the configuration file config.json. Use the information you received before. Then run the script .\DMSOAA.ps1 without any parameters.
 
 .NOTES
     Author: Mikhail Danshin
@@ -124,35 +137,6 @@ function Move-Items ($force) {
             }
         }
     }
-
-    <#
-    foreach ($folder in $config.Folders.sourceFolders)
-    {
-        $exchangeAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.exchangeAccount } # Считываем иформацию о папках п/я из которого будем перемещать элементы
-        $pstFile = $namespace.Folders | Where-Object { $_.Name -eq $config.pstFile } # Считываем иформацию о папках п/я в который будем перемещать элементы
-
-        $fromFolder = $exchangeAccount.Folders | Where-Object { $_.Name -match $folder.PSObject.Properties.Name } # Выбираем папку из которой будем перемещать элементы
-        $toFolder = $pstFile.Folders | Where-Object { $_.Name -match $config.toFolder } # Выбираем папку в которую будем перемещать элементы
-
-        Write-Output ("`nTotal items: " + ($fromFolderItems = $fromFolder.Items).Count) # Кол-во элементов в папке из которой будем перемещать элементы      
-
-        switch ($config.oldest) {
-            'true' {
-                $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $deleteDate}
-                Write-Output ("Older then $deleteDate" + ": " + ( $items | measure-object ).count)
-                }
-            Default {
-                Write-Output ("Younger then $deleteDate" + ": " + ($items = $fromFolderItems | Where-Object -FilterScript { $_.senton -ge $deleteDate}).Count)
-            }
-        }
-        
-        $confirmation = Read-Host "Are you Sure You Want To Proceed [y/N]?"
-        if ($confirmation -ne 'y') {Exit}
-
-        $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($toFolder) }
-        Write-Output ("Moved: " + ( $deletedItems | measure-object ).Count)
-    }
-    #>
 }
 
 function New-Outlook {
