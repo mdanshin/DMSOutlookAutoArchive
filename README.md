@@ -31,20 +31,30 @@ Then run the script with `-Accounts` parameter.
 
 You will see all connected mailboxes and data files.
 
-Finally, edit the configuration file `config.xml`.Use the information you received before. Then run the script without any parameters.
+Finally, edit the configuration file `config.json`.Use the information you received before. Then run the script without any parameters.
 
-## Example of the config.xml
+## Example of the config.json
 
-```XML
-<config>
-  <exchangeAccount>username@domain.com</exchangeAccount> <!--A-->
-  <pstFile>Archive</pstFile>
-  <fromFolder>Sent Items</fromFolder>
-  <toFolder>Sent Items</toFolder>
-  <moveDays>30</moveDays> <!--Not used if moveDate is set-->
-  <moveDate>null</moveDate> <!--MM/dd/yyyy-->
-  <oldest>true</oldest>
-</config>
+```json
+{
+    "exchangeAccount":"username@domain.com",
+    "pstFile":"archive",
+    "moveDate":"10",
+    "Oldest":"true",
+
+    "Folders" : [
+        {
+          "sourceFolders":[
+            {"1":"Inbox1"},
+            {"2":"Inbox2"}
+          ],
+          "destinationFolders":[
+            {"1":"Archive1"},
+            {"2":"Archive2"}
+          ]
+        }
+    ]
+}
 ```
 
 ## Authors

@@ -1,3 +1,4 @@
+#Requires -Version 4.0
 <#
 .SYNOPSIS
 Short description
@@ -9,42 +10,40 @@ Long description
 An example
 
 .NOTES
-General notes
+    Author: Mikhail Danshin
+    Website: https://danshin.ms
 #>
 
 ##
 function New-Config {
-    [System.XML.XMLDocument]$XML = New-Object System.XML.XMLDocument
-    
-    [System.XML.XMLElement]$Root = $XML.CreateElement("config")
-    $XML.appendChild($Root)
 
-    [System.XML.XMLElement]$exchangeAccount = $Root.AppendChild($XML.CreateElement("exchangeAccount"))
-    $exchangeAccount.InnerText = "username@domain.com"
+    $config = [Ordered]@{
+        Inbox=@{
+            fromAccaunt = "username@domain.com"
+            fromFolder = "Inbox"
+            
+            toAccaunt = "My Outlook Data File"
+            toFolder = "Arhive"
 
-    [System.XML.XMLElement]$pstFile = $Root.AppendChild($XML.CreateElement("pstFile"))
-    $pstFile.InnerText = "Archive"
+            moveDays = "10"
+            Oldest = "true"            
+        }
+        
+        Sent=@{
+            fromAccaunt = "username@domain.com"
+            fromFolder = "Inbox"
 
-    [System.XML.XMLElement]$fromFolder = $Root.AppendChild($XML.CreateElement("fromFolder"))
-    $fromFolder.InnerText = "Inbox"
+            toAccaunt = "My Outlook Data File"
+            toFolder = "Arhive"
 
-    [System.XML.XMLElement]$toFolder = $Root.AppendChild($XML.CreateElement("toFolder"))
-    $toFolder.InnerText = "Inbox Archive"
+            moveDays = "10"
+            Oldest = "true"            
+        }
+    }
 
-    [System.XML.XMLElement]$moveDays = $Root.AppendChild($XML.CreateElement("moveDays"))
-    $comment = $XML.CreateComment('Not used if moveDate is set')
-    $XML.DocumentElement.AppendChild($comment)
-    $moveDays.InnerText = "30"
+    New-Object -TypeName PSObject -Property $config
 
-    [System.XML.XMLElement]$moveDate = $Root.AppendChild($XML.CreateElement("moveDate"))
-    $comment = $XML.CreateComment('null or MM/dd/yyyy')
-    $XML.DocumentElement.AppendChild($comment)
-    $moveDate.InnerText = "null"
-
-    [System.XML.XMLElement]$oldest = $Root.AppendChild($XML.CreateElement("oldest"))
-    $oldest.InnerText = "true"
-
-    $XML.Save(("$pwd\config.xml"))
+    New-Item -Path . -Name .\config.json.example -Value ($config | ConvertTo-Json)
 }
 
 function Get-Accounts {
@@ -58,18 +57,102 @@ function Get-Accounts {
     $namespace.Folders | Format-Table name
 }
 
-function Move-Items ($items, $archive, $force) {
-    switch ($force) {
-        'true' {
-            $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($archive) } }
-        Default {
-            $confirmation = Read-Host "Are you Sure You Want To Proceed [y/N]?"
-            if ($confirmation -eq 'y' -and $items) {
-                $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($archive) }
+function Move-Items ($force) {
+    $configFromJson = Read-Config # Читаем конфигурационный файл в переменную $config
+
+    #конвертируем из PSCustomObject в Hashtable
+    $config = @{}
+    $configFromJson.psobject.properties | Foreach { $config[$_.Name] = $_.Value }
+
+    #конвертируем из Hashtable в OrderedDictionary
+    $config = .\ConvertTo-OrderedDictionary.ps1 -Hash $config 
+
+    foreach ($key in $config.Keys)
+    {
+        # Приводим дату к нужному формату
+        $Date = [DateTime]::Now.AddDays(-$config[$key].moveDays)
+        $deleteDate =  $Date.tostring("MM/dd/yyyy") 
+
+        $outlook = New-Object -ComObject outlook.application # Создаём объект Outlook
+        $namespace = $outlook.Getnamespace("MAPI") # Считываем информацию о подключенных п/я и PST-файлах
+
+        foreach ($folder in $config[$key])
+        {
+            #Считываем иформацию о папках п/я из которого будем перемещать элементы
+            $exchangeAccount = $namespace.Folders | Where-Object { $_.Name -eq $config[$key].fromAccaunt }
+            #Считываем иформацию о папках п/я в который будем перемещать элементы
+            $pstFile = $namespace.Folders | Where-Object { $_.Name -eq $config[$key].toAccaunt }
+
+            #Выбираем папку из которой будем перемещать элементы
+            $fromFolder = $exchangeAccount.Folders | Where-Object { $_.Name -match $config[$key].fromFolder }
+            #Выбираем папку в которую будем перемещать элементы
+            $toFolder = $pstFile.Folders | Where-Object { $_.Name -match $config[$key].toFolder }
+
+            #Кол-во элементов в папке из которой будем перемещать элементы
+            Write-Output ("`nTotal items in " + $fromFolder.Name + ": " + ($fromFolderItems = $fromFolder.Items).Count)
+            
+            switch ($config[$key].oldest) {
+                'true' {
+                    $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $deleteDate}
+                    Write-Output ("Older then $deleteDate" + ": " + ( $items | measure-object ).count)
+                    if ($items) {
+                        $confirmation = Read-Host "Are you Sure You Want To Proceed [y/N]?"
+                        if ($confirmation -ne 'y') {Exit} 
+                    }
+                    else {
+                        Write-Output "Nothin to move..."
+                    }
+                    
+                }
+
+                Default {
+                    Write-Output ("Younger then $deleteDate" + ": " + ($items = $fromFolderItems | Where-Object -FilterScript { $_.senton -ge $deleteDate}).Count)
+                    if ($items) {
+                        $confirmation = Read-Host "Are you Sure You Want To Proceed [y/N]?"
+                        if ($confirmation -ne 'y') {Exit} 
+                    }
+                    else {
+                        Write-Output "Nothin to move..."
+                    }
+                }
+            }
+
+            if ($items)
+            {
+                $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($toFolder) }
+                Write-Output ("Moved: " + ( $deletedItems | measure-object ).Count)    
             }
         }
     }
-    Write-Output ("Moved: " + ( $deletedItems | measure-object ).Count)
+
+    <#
+    foreach ($folder in $config.Folders.sourceFolders)
+    {
+        $exchangeAccount = $namespace.Folders | Where-Object { $_.Name -eq $config.exchangeAccount } # Считываем иформацию о папках п/я из которого будем перемещать элементы
+        $pstFile = $namespace.Folders | Where-Object { $_.Name -eq $config.pstFile } # Считываем иформацию о папках п/я в который будем перемещать элементы
+
+        $fromFolder = $exchangeAccount.Folders | Where-Object { $_.Name -match $folder.PSObject.Properties.Name } # Выбираем папку из которой будем перемещать элементы
+        $toFolder = $pstFile.Folders | Where-Object { $_.Name -match $config.toFolder } # Выбираем папку в которую будем перемещать элементы
+
+        Write-Output ("`nTotal items: " + ($fromFolderItems = $fromFolder.Items).Count) # Кол-во элементов в папке из которой будем перемещать элементы      
+
+        switch ($config.oldest) {
+            'true' {
+                $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $deleteDate}
+                Write-Output ("Older then $deleteDate" + ": " + ( $items | measure-object ).count)
+                }
+            Default {
+                Write-Output ("Younger then $deleteDate" + ": " + ($items = $fromFolderItems | Where-Object -FilterScript { $_.senton -ge $deleteDate}).Count)
+            }
+        }
+        
+        $confirmation = Read-Host "Are you Sure You Want To Proceed [y/N]?"
+        if ($confirmation -ne 'y') {Exit}
+
+        $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($toFolder) }
+        Write-Output ("Moved: " + ( $deletedItems | measure-object ).Count)
+    }
+    #>
 }
 
 function New-Outlook {
@@ -80,24 +163,14 @@ function New-Outlook {
 
 function Read-Config {
     try {
-        $config = [xml](Get-Content .\config.xml -Encoding UTF8 -ErrorAction Stop)
+        return (Get-Content -Raw .\config.json -ErrorAction Stop) | ConvertFrom-Json
     }
     catch {
-        Write-Error "config.xml does not exist. Try to use -NewConfig parametr."
+        Write-Error "config.json does not exist. Try to use -NewConfig parametr."
         Break
     }
-
-    [hashtable]$return = @{}
-
-    $return.exchangeAccount = $config.config.exchangeAccount
-    $return.pstFile = $config.config.pstFile
-    $return.fromFolder  = $config.config.fromFolder
-    $return.toFolder  = $config.config.toFolder    
-    $return.moveDays = $config.config.moveDays
-    $return.moveDate = $config.config.moveDate
-    $return.oldest   = $config.config.oldest
-
-    return $return
+    
+    
 
 }
 # SIG # Begin signature block

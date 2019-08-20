@@ -1,9 +1,0 @@
-<config>
-  <exchangeAccount>username@domain.com</exchangeAccount> <!--A-->
-  <pstFile>Archive</pstFile>
-  <fromFolder>Sent Items</fromFolder>
-  <toFolder>Sent Items</toFolder>
-  <moveDays>30</moveDays> <!--Not used if moveDate is set-->
-  <moveDate>null</moveDate> <!-- null or MM/dd/yyyy-->
-  <oldest>true</oldest>
-</config>

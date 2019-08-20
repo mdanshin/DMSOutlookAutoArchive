@@ -1,0 +1,18 @@
+{
+    "Inbox":  {
+                  "toFolder":  "Archive",
+                  "fromFolder":  "Inbox",
+                  "fromAccaunt":  "mdanshin@ibs.ru",
+                  "Oldest":  "true",
+                  "toAccaunt":  "My Outlook Data File",
+                  "moveDays":  "30"
+              },
+    "Sent":  {
+                 "toFolder":  "Sent Items",
+                 "fromFolder":  "Sent Items",
+                 "fromAccaunt":  "mdanshin@ibs.ru",
+                 "Oldest":  "true",
+                 "toAccaunt":  "My Outlook Data File",
+                 "moveDays":  "10"
+             }
+}

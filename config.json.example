@@ -1,0 +1,18 @@
+{
+    "Inbox":  {
+                  "toFolder":  "Arhive",
+                  "fromFolder":  "Inbox",
+                  "fromAccaunt":  "username@domain.com",
+                  "Oldest":  "true",
+                  "toAccaunt":  "My Outlook Data File",
+                  "moveDays":  "10"
+              },
+    "Sent":  {
+                 "toFolder":  "Arhive",
+                 "fromFolder":  "Inbox",
+                 "fromAccaunt":  "username@domain.com",
+                 "Oldest":  "true",
+                 "toAccaunt":  "My Outlook Data File",
+                 "moveDays":  "10"
+             }
+}
