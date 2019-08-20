@@ -1,6 +1,6 @@
 {
     "Inbox":  {
-                  "toFolder":  "Arhive",
+                  "toFolder":  "Archive",
                   "fromFolder":  "Inbox",
                   "fromAccaunt":  "username@domain.com",
                   "Oldest":  "true",
@@ -8,7 +8,7 @@
                   "moveDays":  "10"
               },
     "Sent":  {
-                 "toFolder":  "Arhive",
+                 "toFolder":  "Archive",
                  "fromFolder":  "Inbox",
                  "fromAccaunt":  "username@domain.com",
                  "Oldest":  "true",

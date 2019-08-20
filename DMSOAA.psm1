@@ -36,7 +36,7 @@ function New-Config {
             fromFolder = "Inbox"
             
             toAccaunt = "My Outlook Data File"
-            toFolder = "Arhive"
+            toFolder = "Archive"
 
             moveDays = "10"
             Oldest = "true"            
@@ -47,7 +47,7 @@ function New-Config {
             fromFolder = "Inbox"
 
             toAccaunt = "My Outlook Data File"
-            toFolder = "Arhive"
+            toFolder = "Archive"
 
             moveDays = "10"
             Oldest = "true"            

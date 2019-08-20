@@ -36,10 +36,12 @@ Finally, edit the configuration file `config.json`. Use the information you rece
 
 ## Example of the config.json
 
+The config file contain information about the folders that you want to process with the script.
+
 ```json
 {
     "Inbox":  {
-                  "toFolder":  "Arhive",
+                  "toFolder":  "Archive",
                   "fromFolder":  "Inbox",
                   "fromAccaunt":  "username@domain.com",
                   "Oldest":  "true",
@@ -47,7 +49,7 @@ Finally, edit the configuration file `config.json`. Use the information you rece
                   "moveDays":  "10"
               },
     "Sent":  {
-                 "toFolder":  "Arhive",
+                 "toFolder":  "Archive",
                  "fromFolder":  "Inbox",
                  "fromAccaunt":  "username@domain.com",
                  "Oldest":  "true",
