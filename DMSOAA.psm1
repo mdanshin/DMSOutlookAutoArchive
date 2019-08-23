@@ -70,7 +70,6 @@ function Get-Accounts {
     $namespace.Folders | Format-Table name
 }
 
-
 function Get-Folders ($namespaceFolders, $accaunt) {
     return $namespaceFolders | Where-Object { $_.Name -eq $accaunt }
 }
@@ -81,7 +80,6 @@ function Get-Items () {
 
 function Move-Items ([bool]$force) {
     $config = Read-Config # Читаем конфигурационный файл в переменную $config  
-    
 
     foreach ($key in $config.Keys)
     {
@@ -107,7 +105,7 @@ function Move-Items ([bool]$force) {
             Write-Host (": ") -NoNewline
             Write-Host (($fromFolderItems = $fromFolder.Items).Count) -ForegroundColor Green
 
-#TODO remove code duplication
+            #TODO remove code duplication
             switch ($config[$key].oldest) {
                 'true' {
                     $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $config.moveDays}
@@ -122,9 +120,9 @@ function Move-Items ([bool]$force) {
                     {
                         Write-Output "Nothin to move..."
                     }
-                    
                 }
-#TODO remove code duplication
+
+                #TODO remove code duplication
                 Default {
                     $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $config.moveDays}
                     Write-Output ("Younger then " + $config[$key].moveDays + ": " + ($items = $fromFolderItems | Where-Object -FilterScript { $_.senton -ge $config.moveDays}).Count)
@@ -140,7 +138,6 @@ function Move-Items ([bool]$force) {
                     }
                 }
             }
-
             if ($items)
             {
                 $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($toFolder) }
@@ -169,17 +166,12 @@ function Read-Config {
         {
             $config[$key].moveDays = [DateTime]::Now.AddDays(-$config[$key].moveDays).tostring("MM/dd/yyyy")
         }
-        
-
         return $config
     }
     catch {
         Write-Error "config.json does not exist. Try to use -NewConfig parametr."
         Break
     }
-    
-    
-
 }
 # SIG # Begin signature block
 # MIIO+wYJKoZIhvcNAQcCoIIO7DCCDugCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
