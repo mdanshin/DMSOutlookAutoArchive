@@ -71,14 +71,7 @@ function Get-Accounts {
 }
 
 function Move-Items ([bool]$force) {
-    $configFromJson = Read-Config # Читаем конфигурационный файл в переменную $config
-
-    #конвертируем из PSCustomObject в Hashtable
-    $config = @{}
-    $configFromJson.psobject.properties | Foreach { $config[$_.Name] = $_.Value }
-
-    #конвертируем из Hashtable в OrderedDictionary
-    $config = .\ConvertTo-OrderedDictionary.ps1 -Hash $config 
+    $config = Read-Config # Читаем конфигурационный файл в переменную $config  
 
     foreach ($key in $config.Keys)
     {
@@ -167,7 +160,13 @@ function Get-Items () {
 
 function Read-Config {
     try {
-        return (Get-Content -Raw .\config.json -ErrorAction Stop) | ConvertFrom-Json
+        #конвертируем из PSCustomObject в OrderedDictionary. In powershell 6.0 use -AsHashtable parameters
+        $config = [ordered]@{}
+        
+        $configJson = (Get-Content -Raw .\config.json -ErrorAction Stop) | ConvertFrom-Json
+        $configJson.psobject.properties | ForEach-Object { $config[$_.Name] = $_.Value }
+
+        return $config
     }
     catch {
         Write-Error "config.json does not exist. Try to use -NewConfig parametr."
