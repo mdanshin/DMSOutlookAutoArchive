@@ -85,10 +85,6 @@ function Move-Items ([bool]$force) {
 
     foreach ($key in $config.Keys)
     {
-        #$outlook = New-Object -ComObject outlook.application # Создаём объект Outlook
-        #$namespace = $outlook.Getnamespace("MAPI") # Считываем информацию о подключенных п/я и PST-файлах
-        
-
         foreach ($folder in $config[$key])
         {
             $namespace = New-Outlook
@@ -104,8 +100,7 @@ function Move-Items ([bool]$force) {
             #Выбираем папку в которую будем перемещать элементы
             $toFolder = $pstFile.Folders | Where-Object { $_.Name -match $config[$key].toFolder }
 
-            #Кол-во элементов в папке из которой будем перемещать элементы
-            
+            #Кол-во элементов в папке из которой будем перемещать элементы            
             Write-Host ($exchangeAccount.Name) -ForegroundColor Yellow -NoNewline
             Write-Host (" in ") -NoNewline
             write-Host ($fromFolder.Name) -ForegroundColor Yellow -NoNewline
