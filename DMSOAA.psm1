@@ -70,24 +70,34 @@ function Get-Accounts {
     $namespace.Folders | Format-Table name
 }
 
+
+function Get-Folders ($namespaceFolders, $accaunt) {
+    return $namespaceFolders | Where-Object { $_.Name -eq $accaunt }
+}
+
+function Get-Items () {
+    #TODO
+}
+
 function Move-Items ([bool]$force) {
     $config = Read-Config # Читаем конфигурационный файл в переменную $config  
+    
 
     foreach ($key in $config.Keys)
     {
-        # Приводим дату к нужному формату
-        $Date = [DateTime]::Now.AddDays(-$config[$key].moveDays)
-        $deleteDate =  $Date.tostring("MM/dd/yyyy") 
-
-        $outlook = New-Object -ComObject outlook.application # Создаём объект Outlook
-        $namespace = $outlook.Getnamespace("MAPI") # Считываем информацию о подключенных п/я и PST-файлах
+        #$outlook = New-Object -ComObject outlook.application # Создаём объект Outlook
+        #$namespace = $outlook.Getnamespace("MAPI") # Считываем информацию о подключенных п/я и PST-файлах
+        
 
         foreach ($folder in $config[$key])
         {
+            $namespace = New-Outlook
+
             #Считываем иформацию о папках п/я из которого будем перемещать элементы
-            $exchangeAccount = $namespace.Folders | Where-Object { $_.Name -eq $config[$key].fromAccaunt }
+            $exchangeAccount = Get-Folders $namespace.Folders $config[$key].fromAccaunt
+
             #Считываем иформацию о папках п/я в который будем перемещать элементы
-            $pstFile = $namespace.Folders | Where-Object { $_.Name -eq $config[$key].toAccaunt }
+            $pstFile = Get-Folders $namespace.Folders $config[$key].toAccaunt
 
             #Выбираем папку из которой будем перемещать элементы
             $fromFolder = $exchangeAccount.Folders | Where-Object { $_.Name -match $config[$key].fromFolder }
@@ -95,17 +105,18 @@ function Move-Items ([bool]$force) {
             $toFolder = $pstFile.Folders | Where-Object { $_.Name -match $config[$key].toFolder }
 
             #Кол-во элементов в папке из которой будем перемещать элементы
-            Write-Host ("`nTotal items for account ") -NoNewline
+            
             Write-Host ($exchangeAccount.Name) -ForegroundColor Yellow -NoNewline
             Write-Host (" in ") -NoNewline
             write-Host ($fromFolder.Name) -ForegroundColor Yellow -NoNewline
             Write-Host (": ") -NoNewline
             Write-Host (($fromFolderItems = $fromFolder.Items).Count) -ForegroundColor Green
+
 #TODO remove code duplication
             switch ($config[$key].oldest) {
                 'true' {
-                    $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $deleteDate}
-                    Write-Host ("Older then $deleteDate" + ": " + ( $items | measure-object ).count) 
+                    $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $config.moveDays}
+                    Write-Host ("Older then " + $config[$key].moveDays + ": " + ( $items | measure-object ).count) 
                     
                     if (($null -ne $items) -and ($force -eq $false))
                     {
@@ -120,8 +131,8 @@ function Move-Items ([bool]$force) {
                 }
 #TODO remove code duplication
                 Default {
-                    $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $deleteDate}
-                    Write-Output ("Younger then $deleteDate" + ": " + ($items = $fromFolderItems | Where-Object -FilterScript { $_.senton -ge $deleteDate}).Count)
+                    $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $config.moveDays}
+                    Write-Output ("Younger then " + $config[$key].moveDays + ": " + ($items = $fromFolderItems | Where-Object -FilterScript { $_.senton -ge $config.moveDays}).Count)
 
                     if (($null -ne $items) -and ($force -eq $false))
                     {
@@ -150,14 +161,6 @@ function New-Outlook {
     return $namespace
 }
 
-function Get-Folders () {
-    #TODO
-}
-
-function Get-Items () {
-    #TODO
-}
-
 function Read-Config {
     try {
         #конвертируем из PSCustomObject в OrderedDictionary. In powershell 6.0 use -AsHashtable parameters
@@ -165,6 +168,13 @@ function Read-Config {
         
         $configJson = (Get-Content -Raw .\config.json -ErrorAction Stop) | ConvertFrom-Json
         $configJson.psobject.properties | ForEach-Object { $config[$_.Name] = $_.Value }
+
+        # Приводим дату к нужному формату
+        foreach($key in $config.keys)
+        {
+            $config[$key].moveDays = [DateTime]::Now.AddDays(-$config[$key].moveDays).tostring("MM/dd/yyyy")
+        }
+        
 
         return $config
     }
