@@ -41,7 +41,8 @@ switch ($PsCmdlet.ParameterSetName) {
         Read-Config | ConvertTo-Json
     }    
     Default { # Дейсвтие по умолчанию, если не введён ни один параметр
-        Move-Items ($Force)
+        $config = Read-Config # Читаем конфигурационный файл в переменную $config  
+        Move-Items $Force $config
     }
 }
 # SIG # Begin signature block

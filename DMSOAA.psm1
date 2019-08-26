@@ -70,33 +70,24 @@ function Get-Accounts {
     $namespace.Folders | Format-Table name
 }
 
-function Get-Folders ($namespaceFolders, $accaunt) {
-    return $namespaceFolders | Where-Object { $_.Name -eq $accaunt }
+function Get-Folders ( $accaunt) {
+    $namespace = New-Outlook
+    return $namespace.Folders | Where-Object { $_.Name -eq $accaunt }
 }
 
 function Get-Items () {
     #TODO
 }
 
-function Move-Items ([bool]$force) {
-    $config = Read-Config # Читаем конфигурационный файл в переменную $config  
-
+function Move-Items ([bool]$force, $config) { 
     foreach ($key in $config.Keys)
     {
         foreach ($folder in $config[$key])
-        {
-            $namespace = New-Outlook
-
+        {           
             #Считываем иформацию о папках п/я из которого будем перемещать элементы
-            $exchangeAccount = Get-Folders $namespace.Folders $config[$key].fromAccaunt
-
-            #Считываем иформацию о папках п/я в который будем перемещать элементы
-            $pstFile = Get-Folders $namespace.Folders $config[$key].toAccaunt
-
+            $exchangeAccount = Get-Folders $config[$key].fromAccaunt
             #Выбираем папку из которой будем перемещать элементы
             $fromFolder = $exchangeAccount.Folders | Where-Object { $_.Name -match $config[$key].fromFolder }
-            #Выбираем папку в которую будем перемещать элементы
-            $toFolder = $pstFile.Folders | Where-Object { $_.Name -match $config[$key].toFolder }
 
             #Кол-во элементов в папке из которой будем перемещать элементы            
             Write-Host ($exchangeAccount.Name) -ForegroundColor Yellow -NoNewline
@@ -140,6 +131,11 @@ function Move-Items ([bool]$force) {
             }
             if ($items)
             {
+                #Считываем иформацию о папках п/я в который будем перемещать элементы
+                $pstFile = Get-Folders $config[$key].toAccaunt
+                #Выбираем папку в которую будем перемещать элементы
+                $toFolder = $pstFile.Folders | Where-Object { $_.Name -match $config[$key].toFolder }
+
                 $deletedItems = $items | ForEach-Object -Process { $PSItem.Move($toFolder) }
                 Write-Output ("Moved: " + ( $deletedItems | measure-object ).Count)    
             }
