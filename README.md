@@ -17,22 +17,22 @@ You will need PowerShell and Microsoft Outlook. Please note that Outlook must be
 
 Clone or download project and extract from archive.
 
-First run the `DMSOAA.ps1` with `-NewConfig` parameter.
+First run the `Archive-OutlookItems.ps1` with `-NewConfig` parameter.
 
 ```Powershell
-.\DMSOAA.ps1 -NewConfig
+.\Archive-OutlookItems.ps1 -NewConfig
 cp .\config.json.example .\config.json
 ```
 
 Then run the script with `-Accounts` parameter.
 
 ```Powershell
-.\DMSOAA.ps1 -Accounts
+.\Archive-OutlookItems.ps1 -Accounts
 ```
 
 You will see all connected mailboxes and data files.
 
-Finally, edit the configuration file `config.json`. Use the information you received before. Then run the script `.\DMSOAA.ps1` without any parameters.
+Finally, edit the configuration file `config.json`. Use the information you received before. Then run the script `.\Archive-OutlookItems.ps1` without any parameters.
 
 ## Example of the config.json
 

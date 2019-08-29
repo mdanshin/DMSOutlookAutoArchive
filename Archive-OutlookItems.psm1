@@ -9,18 +9,18 @@ Move Outlook items from mailbox to archive, e.g. PST file
 .EXAMPLE
 Clone or download project and extract from archive.
 
-First run the DMSOAA.ps1 with -NewConfig parameter.
+First run the Archive-OutlookItems.ps1 with -NewConfig parameter.
 
-.\DMSOAA.ps1 -NewConfig
+.\Archive-OutlookItems.ps1 -NewConfig
 cp .\config.json.example .\config.json
 
 Then run the script with -Accounts parameter.
 
-.\DMSOAA.ps1 -Accounts
+.\Archive-OutlookItems.ps1 -Accounts
 
 You will see all connected mailboxes and data files.
 
-Finally, edit the configuration file config.json. Use the information you received before. Then run the script .\DMSOAA.ps1 without any parameters.
+Finally, edit the configuration file config.json. Use the information you received before. Then run the script .\Archive-OutlookItems.ps1 without any parameters.
 
 .NOTES
     Author: Mikhail Danshin
@@ -59,48 +59,42 @@ function New-Config {
     New-Item -Path . -Name .\config.json.example -Value ($config | ConvertTo-Json)
 }
 
-function Get-Accounts {
-    
-    [CmdletBinding()]
-    param (
-        [Parameter(Position=0,mandatory=$true)]
-        $namespace
-    )
-
-    $namespace.Folders | Format-Table name
+function Get-OutlookAccounts ($namespace) {
+    return $namespace.Folders | Format-Table name
 }
 
-function Get-Folders ( $accaunt) {
+function Get-OutlookFolders ($accaunt) {
     $namespace = New-Outlook
     return $namespace.Folders | Where-Object { $_.Name -eq $accaunt }
 }
 
-function Get-Items () {
+function Get-OutlookItems () {
     #TODO
 }
 
-function Move-Items ([bool]$force, $config) { 
+function Move-OutlookItems ([bool]$force, $config) { 
     foreach ($key in $config.Keys)
     {
         foreach ($folder in $config[$key])
         {           
             #Считываем иформацию о папках п/я из которого будем перемещать элементы
-            $exchangeAccount = Get-Folders $config[$key].fromAccaunt
+            $exchangeAccount = Get-OutlookFolders $config[$key].fromAccaunt
             #Выбираем папку из которой будем перемещать элементы
             $fromFolder = $exchangeAccount.Folders | Where-Object { $_.Name -match $config[$key].fromFolder }
 
-            #Кол-во элементов в папке из которой будем перемещать элементы            
+            #Кол-во элементов в папке из которой будем перемещать элементы                        
             Write-Host ($exchangeAccount.Name) -ForegroundColor Yellow -NoNewline
             Write-Host (" in ") -NoNewline
             write-Host ($fromFolder.Name) -ForegroundColor Yellow -NoNewline
             Write-Host (": ") -NoNewline
             Write-Host (($fromFolderItems = $fromFolder.Items).Count) -ForegroundColor Green
+            
 
             #TODO remove code duplication
             switch ($config[$key].oldest) {
                 'true' {
-                    $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $config.moveDays}
-                    Write-Host ("Older then " + $config[$key].moveDays + ": " + ( $items | measure-object ).count) 
+                    $items = $fromFolderItems | Where-Object -FilterScript { $_.senton -le $config[$key].moveDays}
+                    Write-Host ("Older then " + $config[$key].moveDays + ": " + ( $items | measure-object ).count)                     
                     
                     if (($null -ne $items) -and ($force -eq $false))
                     {
@@ -109,7 +103,7 @@ function Move-Items ([bool]$force, $config) {
                     }
                     elseif ($null -eq $items)                        
                     {
-                        Write-Output "Nothin to move..."
+                        Write-Output "Nothin to move...`r`n"
                     }
                 }
 
@@ -125,14 +119,14 @@ function Move-Items ([bool]$force, $config) {
                     }
                     elseif ($null -eq $items)
                     {
-                        Write-Output "Nothin to move..."
+                        Write-Output "Nothin to move...`r`n"
                     }
                 }
             }
             if ($items)
             {
                 #Считываем иформацию о папках п/я в который будем перемещать элементы
-                $pstFile = Get-Folders $config[$key].toAccaunt
+                $pstFile = Get-OutlookFolders $config[$key].toAccaunt
                 #Выбираем папку в которую будем перемещать элементы
                 $toFolder = $pstFile.Folders | Where-Object { $_.Name -match $config[$key].toFolder }
 

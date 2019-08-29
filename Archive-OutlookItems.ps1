@@ -23,12 +23,12 @@ Param(
 Set-Location $PSScriptRoot 
 
 # Подключаем модуль с функциями
-Import-Module .\DMSOAA.psm1 -Force
+Import-Module .\Archive-OutlookItems.psm1 -Force
 
 # Определяем действия программы, в зависимости от указанных параметров командной строки
 switch ($PsCmdlet.ParameterSetName) {
     "Accounts" {
-        Get-Accounts (New-Outlook) # Вывести на экран информацию о подключенных п/я и PST-файлах
+        Get-OutlookAccounts (New-Outlook) # Вывести на экран информацию о подключенных п/я и PST-файлах
         Exit
     }
     "NewConfig" {
@@ -42,7 +42,7 @@ switch ($PsCmdlet.ParameterSetName) {
     }    
     Default { # Дейсвтие по умолчанию, если не введён ни один параметр
         $config = Read-Config # Читаем конфигурационный файл в переменную $config  
-        Move-Items $Force $config
+        Move-OutlookItems $Force $config
     }
 }
 # SIG # Begin signature block
